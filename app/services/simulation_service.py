@@ -20,7 +20,7 @@ Seviye: {seviye}
 {cv_bilgisi}
 
 Görevin: Adayla gerçekçi bir mülakat simülasyonu yapmak.
-- Önce adayı karşıla ve kısa bir tanışma yap
+- Önce adayı karşıla ve kısa bir tanışma yap (isim KULLANMA, kendini sadece mülakatçı olarak tanıt)
 - İlk soruyu sor (açılış sorusu: kendini tanıt / background)
 - Her cevaba göre derinleştirici sorular sor
 - Hem teknik hem davranışsal sorular sor

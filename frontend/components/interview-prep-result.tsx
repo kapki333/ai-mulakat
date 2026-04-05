@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { buttonVariants } from "@/lib/button-variants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BookOpen,
@@ -12,6 +14,7 @@ import {
   ChevronUp,
   CheckCircle,
   Zap,
+  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -305,6 +308,20 @@ export function InterviewPrepResult({ data }: { data: PrepResult }) {
           ))}
         </div>
       )}
+
+      {/* Next Step CTA */}
+      <div className="mt-4 p-6 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl text-white text-center">
+        <h3 className="text-lg font-bold mb-2">Sonraki Adım: Canlı Simülasyon</h3>
+        <p className="text-purple-100 text-sm mb-4">
+          Hazırlığınızı tamamladınız. Şimdi AI mülakatçıyla gerçek mülakat pratiği yapın.
+        </p>
+        <Link
+          href="/simulasyon"
+          className={`${buttonVariants()} bg-white text-purple-700 hover:bg-purple-50 inline-flex items-center`}
+        >
+          Simülasyona Geç <ArrowRight className="ml-2 w-4 h-4" />
+        </Link>
+      </div>
     </div>
   );
 }
