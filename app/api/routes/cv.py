@@ -28,6 +28,8 @@ async def analyze_cv_endpoint(file: UploadFile = File(...)):
 
     try:
         cv_text = extract_text_from_pdf(file_bytes)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"PDF okunamadı: {str(e)}")
 

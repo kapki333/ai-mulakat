@@ -29,14 +29,18 @@ async def validate_is_cv(cv_text: str) -> None:
         messages=[
             {
                 "role": "system",
-                "content": 'Sana verilen metnin bir CV/özgeçmiş olup olmadığını belirle. Sadece {"is_cv": true} veya {"is_cv": false} döndür.',
+                "content": """Sana verilen metnin kişisel bir CV/özgeçmiş olup olmadığını belirle.
+
+CV'nin özellikleri: kişisel iletişim bilgileri, iş/staj deneyimleri, eğitim geçmişi, beceriler.
+CV DEĞİLDİR: tez, makale, rapor, ders notu, kitap, proje dökümanı, teknik belge.
+
+Sadece JSON döndür: {"is_cv": true} veya {"is_cv": false}""",
             },
-            {"role": "user", "content": cv_text[:2000]},
+            {"role": "user", "content": cv_text[:3000]},
         ],
         temperature=0,
         response_format={"type": "json_object"},
     )
-    import json
     result = json.loads(response.choices[0].message.content)
     if not result.get("is_cv", False):
         raise ValueError(
