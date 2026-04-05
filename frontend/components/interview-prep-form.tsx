@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Loader2, BookOpen, Building2, User, ChevronDown } from "lucide-react";
@@ -17,6 +17,13 @@ export function InterviewPrepForm({ onResult }: InterviewPrepFormProps) {
   const [seviye, setSeviye] = useState("Mid-level");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const kayitli = JSON.parse(localStorage.getItem("mulakat_ayarlari") || "{}");
+    if (kayitli.pozisyon) setPozisyon(kayitli.pozisyon);
+    if (kayitli.sirket) setSirket(kayitli.sirket);
+    if (kayitli.seviye) setSeviye(kayitli.seviye);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,6 +46,7 @@ export function InterviewPrepForm({ onResult }: InterviewPrepFormProps) {
       }
 
       const data = await res.json();
+      localStorage.setItem("mulakat_ayarlari", JSON.stringify({ pozisyon, sirket, seviye }));
       onResult(data);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Bağlantı hatası.");

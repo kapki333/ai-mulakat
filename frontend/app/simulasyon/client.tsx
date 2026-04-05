@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SimulationChat } from "@/components/simulation-chat";
 import { MessageSquare, Building2, User, ChevronDown } from "lucide-react";
@@ -18,6 +18,13 @@ function ConfigForm({ onStart }: { onStart: (config: SimConfig) => void }) {
   const [pozisyon, setPozisyon] = useState("");
   const [sirket, setSirket] = useState("");
   const [seviye, setSeviye] = useState("Mid-level");
+
+  useEffect(() => {
+    const kayitli = JSON.parse(localStorage.getItem("mulakat_ayarlari") || "{}");
+    if (kayitli.pozisyon) setPozisyon(kayitli.pozisyon);
+    if (kayitli.sirket) setSirket(kayitli.sirket);
+    if (kayitli.seviye) setSeviye(kayitli.seviye);
+  }, []);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

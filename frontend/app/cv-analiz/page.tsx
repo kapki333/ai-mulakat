@@ -44,7 +44,14 @@ export default function CvAnalyzePage() {
           </p>
         </div>
 
-        <CvUploader onAnalysisComplete={setResult} />
+        <CvUploader onAnalysisComplete={(data) => {
+          setResult(data);
+          const mevcut = JSON.parse(localStorage.getItem("mulakat_ayarlari") || "{}");
+          localStorage.setItem("mulakat_ayarlari", JSON.stringify({
+            ...mevcut,
+            seviye: data.analiz.deneyim_seviyesi || mevcut.seviye,
+          }));
+        }} />
 
         {/* Results */}
         {result && (
