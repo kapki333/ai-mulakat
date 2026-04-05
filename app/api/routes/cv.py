@@ -1,6 +1,6 @@
 import os
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from app.services.cv_service import extract_text_from_pdf, analyze_cv
+from app.services.cv_service import extract_text_from_pdf, validate_is_cv, analyze_cv
 from app.core.config import settings
 
 router = APIRouter(prefix="/cv", tags=["CV Analizi"])
@@ -36,6 +36,11 @@ async def analyze_cv_endpoint(file: UploadFile = File(...)):
             status_code=422,
             detail="PDF'ten yeterli metin çıkarılamadı. Metin tabanlı bir PDF yükleyin.",
         )
+
+    try:
+        await validate_is_cv(cv_text)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
     # Save to uploads dir
     os.makedirs(settings.upload_dir, exist_ok=True)
