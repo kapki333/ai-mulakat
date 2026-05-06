@@ -2,8 +2,6 @@
 
 Yapay zeka destekli **CV analizi**, **kişiselleştirilmiş mülakat hazırlığı** ve **canlı mülakat simülasyonu** sunan modern bir kariyer hazırlık platformu.
 
-🔗 **Canlı Demo:** https://ai-mulakat.vercel.app
-
 ---
 
 ## 🚀 Proje Hakkında
