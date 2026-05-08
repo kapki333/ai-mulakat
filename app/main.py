@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import cv, interview_prep, simulation
+from app.core.config import settings
+from app.core.rate_limit import InMemoryRateLimitMiddleware
 
 app = FastAPI(
     title="Kariyer ve Mülakat Hazırlık Platformu",
@@ -11,11 +13,12 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.allowed_origin_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(InMemoryRateLimitMiddleware)
 
 app.include_router(cv.router, prefix="/api/v1")
 app.include_router(interview_prep.router, prefix="/api/v1")

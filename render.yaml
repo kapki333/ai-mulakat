@@ -21,3 +21,9 @@ services:
         value: uploads
       - key: MAX_UPLOAD_SIZE_MB
         value: "10"
+      - key: ALLOWED_ORIGINS
+        value: http://localhost:3000,http://127.0.0.1:3000,https://ai-mulakat-i0bnwaica-sef1.vercel.app,https://ai-mulakat-1.vercel.app
+      - key: RATE_LIMIT_REQUESTS
+        value: "30"
+      - key: RATE_LIMIT_WINDOW_SECONDS
+        value: "3600"

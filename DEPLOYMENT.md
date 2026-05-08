@@ -65,6 +65,9 @@ Environment variables:
 - `APP_DEBUG`: `False`
 - `UPLOAD_DIR`: `uploads`
 - `MAX_UPLOAD_SIZE_MB`: `10`
+- `ALLOWED_ORIGINS`: `https://ai-mulakat-i0bnwaica-sef1.vercel.app,https://ai-mulakat-1.vercel.app`
+- `RATE_LIMIT_REQUESTS`: `30`
+- `RATE_LIMIT_WINDOW_SECONDS`: `3600`
 
 Render Free servisleri boşta kaldığında uykuya geçebilir. Sunumdan 5 dakika önce backend URL'sindeki `/health` adresini açmak ilk beklemeyi azaltır.
 

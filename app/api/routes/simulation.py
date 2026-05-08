@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from app.core.openai_client import OpenAIConfigurationError, get_ai_error_status_and_message
 from app.services.simulation_service import start_simulation, continue_simulation, evaluate_simulation
 
@@ -7,22 +7,22 @@ router = APIRouter(prefix="/simulation", tags=["Mülakat Simülasyonu"])
 
 
 class SimulationStartRequest(BaseModel):
-    pozisyon: str
-    sirket: str = ""
-    seviye: str = "Mid-level"
-    cv_ozeti: str = ""
+    pozisyon: str = Field(..., min_length=1, max_length=100)
+    sirket: str = Field(default="", max_length=100)
+    seviye: str = Field(default="Mid-level", max_length=30)
+    cv_ozeti: str = Field(default="", max_length=3000)
 
 
 class SimulationContinueRequest(BaseModel):
-    sistem_mesaji: str
-    mesaj_gecmisi: list[dict]
-    kullanici_cevabi: str
-    mesaj_sayisi: int
+    sistem_mesaji: str = Field(..., min_length=1, max_length=5000)
+    mesaj_gecmisi: list[dict] = Field(default_factory=list, max_length=24)
+    kullanici_cevabi: str = Field(..., min_length=1, max_length=2500)
+    mesaj_sayisi: int = Field(..., ge=1, le=20)
 
 
 class SimulationEvaluateRequest(BaseModel):
-    mesaj_gecmisi: list[dict]
-    pozisyon: str
+    mesaj_gecmisi: list[dict] = Field(default_factory=list, max_length=24)
+    pozisyon: str = Field(..., min_length=1, max_length=100)
 
 
 @router.get("/health")

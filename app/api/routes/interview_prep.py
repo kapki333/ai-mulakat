@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from app.core.openai_client import OpenAIConfigurationError, get_ai_error_status_and_message
 from app.services.interview_prep_service import generate_interview_prep
 
@@ -7,10 +7,10 @@ router = APIRouter(prefix="/interview-prep", tags=["Mülakat Hazırlık"])
 
 
 class InterviewPrepRequest(BaseModel):
-    pozisyon: str
-    sirket: str = ""
-    seviye: str = "Mid-level"
-    cv_ozeti: str = ""
+    pozisyon: str = Field(..., min_length=1, max_length=100)
+    sirket: str = Field(default="", max_length=100)
+    seviye: str = Field(default="Mid-level", max_length=30)
+    cv_ozeti: str = Field(default="", max_length=3000)
 
 
 @router.get("/health")
