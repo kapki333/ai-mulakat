@@ -1,8 +1,6 @@
 import json
-from openai import AsyncOpenAI
 from app.core.config import settings
-
-client = AsyncOpenAI(api_key=settings.openai_api_key)
+from app.core.openai_client import get_openai_client
 
 
 async def generate_interview_prep(
@@ -11,6 +9,7 @@ async def generate_interview_prep(
     seviye: str = "Mid-level",
     cv_ozeti: str = "",
 ) -> dict:
+    client = get_openai_client()
     sirket_bilgisi = f"Şirket: {sirket}" if sirket else ""
     cv_bilgisi = f"\n\nAdayın CV özeti:\n{cv_ozeti[:3000]}" if cv_ozeti else ""
 

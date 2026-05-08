@@ -1,5 +1,8 @@
 import os
+from pathlib import Path
+from uuid import uuid4
 from fastapi import APIRouter, UploadFile, File, HTTPException
+from app.core.openai_client import OpenAIConfigurationError, get_ai_error_status_and_message
 from app.services.cv_service import extract_text_from_pdf, validate_is_cv, analyze_cv
 from app.core.config import settings
 
@@ -41,19 +44,28 @@ async def analyze_cv_endpoint(file: UploadFile = File(...)):
 
     try:
         await validate_is_cv(cv_text)
+    except OpenAIConfigurationError as e:
+        raise HTTPException(status_code=503, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
+    except Exception as e:
+        status_code, message = get_ai_error_status_and_message(e)
+        raise HTTPException(status_code=status_code, detail=message)
 
-    # Save to uploads dir
+    # Dosyayı kullanıcı adını doğrudan dosya yolu yapmadan sakla.
     os.makedirs(settings.upload_dir, exist_ok=True)
-    save_path = os.path.join(settings.upload_dir, file.filename)
+    suffix = Path(file.filename or "cv.pdf").suffix or ".pdf"
+    save_path = os.path.join(settings.upload_dir, f"{uuid4().hex}{suffix.lower()}")
     with open(save_path, "wb") as f:
         f.write(file_bytes)
 
     try:
         analysis = await analyze_cv(cv_text)
+    except OpenAIConfigurationError as e:
+        raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Analiz hatası: {str(e)}")
+        status_code, message = get_ai_error_status_and_message(e)
+        raise HTTPException(status_code=status_code, detail=f"Analiz hatası: {message}")
 
     return {
         "dosya_adi": file.filename,

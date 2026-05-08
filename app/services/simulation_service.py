@@ -1,8 +1,6 @@
 import json
-from openai import AsyncOpenAI
 from app.core.config import settings
-
-client = AsyncOpenAI(api_key=settings.openai_api_key)
+from app.core.openai_client import get_openai_client
 
 
 async def start_simulation(
@@ -12,6 +10,7 @@ async def start_simulation(
     cv_ozeti: str = "",
 ) -> dict:
     """Simülasyonu başlat ve ilk soruyu oluştur."""
+    client = get_openai_client()
     sirket_bilgisi = f"{sirket} şirketindeki" if sirket else ""
     cv_bilgisi = f"\n\nAdayın CV özeti:\n{cv_ozeti[:2000]}" if cv_ozeti else ""
 
@@ -55,6 +54,7 @@ async def continue_simulation(
     mesaj_sayisi: int,
 ) -> dict:
     """Kullanıcı cevabına göre simülasyona devam et."""
+    client = get_openai_client()
 
     messages = [{"role": "system", "content": sistem_mesaji}]
     messages.extend(mesaj_gecmisi)
@@ -89,6 +89,7 @@ async def continue_simulation(
 
 async def evaluate_simulation(mesaj_gecmisi: list[dict], pozisyon: str) -> dict:
     """Tamamlanan simülasyonu değerlendir."""
+    client = get_openai_client()
 
     konusma = "\n".join(
         [

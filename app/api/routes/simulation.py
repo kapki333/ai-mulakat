@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from app.core.openai_client import OpenAIConfigurationError, get_ai_error_status_and_message
 from app.services.simulation_service import start_simulation, continue_simulation, evaluate_simulation
 
 router = APIRouter(prefix="/simulation", tags=["Mülakat Simülasyonu"])
@@ -41,8 +42,11 @@ async def start(request: SimulationStartRequest):
             seviye=request.seviye,
             cv_ozeti=request.cv_ozeti,
         )
+    except OpenAIConfigurationError as e:
+        raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Simülasyon başlatılamadı: {str(e)}")
+        status_code, message = get_ai_error_status_and_message(e)
+        raise HTTPException(status_code=status_code, detail=f"Simülasyon başlatılamadı: {message}")
 
     return result
 
@@ -56,8 +60,11 @@ async def respond(request: SimulationContinueRequest):
             kullanici_cevabi=request.kullanici_cevabi,
             mesaj_sayisi=request.mesaj_sayisi,
         )
+    except OpenAIConfigurationError as e:
+        raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Cevap işlenemedi: {str(e)}")
+        status_code, message = get_ai_error_status_and_message(e)
+        raise HTTPException(status_code=status_code, detail=f"Cevap işlenemedi: {message}")
 
     return result
 
@@ -69,7 +76,10 @@ async def evaluate(request: SimulationEvaluateRequest):
             mesaj_gecmisi=request.mesaj_gecmisi,
             pozisyon=request.pozisyon,
         )
+    except OpenAIConfigurationError as e:
+        raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Değerlendirme yapılamadı: {str(e)}")
+        status_code, message = get_ai_error_status_and_message(e)
+        raise HTTPException(status_code=status_code, detail=f"Değerlendirme yapılamadı: {message}")
 
     return {"degerlendirme": result}

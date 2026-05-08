@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SimulationChat } from "@/components/simulation-chat";
 import { MessageSquare, Building2, User, ChevronDown } from "lucide-react";
@@ -14,17 +14,21 @@ interface SimConfig {
   seviye: string;
 }
 
-function ConfigForm({ onStart }: { onStart: (config: SimConfig) => void }) {
-  const [pozisyon, setPozisyon] = useState("");
-  const [sirket, setSirket] = useState("");
-  const [seviye, setSeviye] = useState("Mid-level");
+function readSavedConfig(): Partial<SimConfig> {
+  if (typeof window === "undefined") return {};
 
-  useEffect(() => {
-    const kayitli = JSON.parse(localStorage.getItem("mulakat_ayarlari") || "{}");
-    if (kayitli.pozisyon) setPozisyon(kayitli.pozisyon);
-    if (kayitli.sirket) setSirket(kayitli.sirket);
-    if (kayitli.seviye) setSeviye(kayitli.seviye);
-  }, []);
+  try {
+    return JSON.parse(localStorage.getItem("mulakat_ayarlari") || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function ConfigForm({ onStart }: { onStart: (config: SimConfig) => void }) {
+  const [savedConfig] = useState(readSavedConfig);
+  const [pozisyon, setPozisyon] = useState(savedConfig.pozisyon ?? "");
+  const [sirket, setSirket] = useState(savedConfig.sirket ?? "");
+  const [seviye, setSeviye] = useState(savedConfig.seviye ?? "Mid-level");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

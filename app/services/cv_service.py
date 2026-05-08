@@ -1,12 +1,42 @@
 import pdfplumber
 import json
-from openai import AsyncOpenAI
 from app.core.config import settings
-
-client = AsyncOpenAI(api_key=settings.openai_api_key)
+from app.core.openai_client import get_openai_client
 
 
 MAX_CV_PAGES = 10
+
+
+def normalize_cv_analysis(result: dict) -> dict:
+    if "tespit_edilen_sektör" not in result and "tespit_edilen_sektor" in result:
+        result["tespit_edilen_sektör"] = result["tespit_edilen_sektor"]
+
+    defaults = {
+        "genel_puan": 0,
+        "ozet": "",
+        "yapisal_hatalar": [],
+        "icerik_hatalari": [],
+        "eksik_yetkinlikler": [],
+        "guclu_yonler": [],
+        "tespit_edilen_sektör": "Belirlenemedi",
+        "deneyim_seviyesi": "Belirlenemedi",
+    }
+    for key, value in defaults.items():
+        if result.get(key) in (None, ""):
+            result[key] = value
+
+    keywords = result.get("anahtar_kelime_onerileri") or {}
+    if not isinstance(keywords, dict):
+        keywords = {}
+    result["anahtar_kelime_onerileri"] = keywords
+
+    if "sektörel" not in keywords and "sektorel" in keywords:
+        keywords["sektörel"] = keywords["sektorel"]
+    for key in ("teknik", "sektörel", "yumusak_beceriler"):
+        if not isinstance(keywords.get(key), list):
+            keywords[key] = []
+
+    return result
 
 
 def extract_text_from_pdf(file_bytes: bytes) -> str:
@@ -24,6 +54,7 @@ def extract_text_from_pdf(file_bytes: bytes) -> str:
 
 async def validate_is_cv(cv_text: str) -> None:
     """Metnin gerçekten bir CV olup olmadığını kontrol eder."""
+    client = get_openai_client()
     response = await client.chat.completions.create(
         model=settings.openai_model,
         messages=[
@@ -50,6 +81,7 @@ Sadece JSON döndür: {"is_cv": true} veya {"is_cv": false}""",
 
 
 async def analyze_cv(cv_text: str) -> dict:
+    client = get_openai_client()
     system_prompt = """Sen deneyimli bir İK uzmanı ve kariyer koçusun. Sana verilen CV metnini analiz ederek JSON formatında rapor oluştur.
 
 JSON yapısı şu şekilde olmalı:
@@ -88,4 +120,4 @@ Sadece JSON döndür, başka bir şey yazma."""
     )
 
     result = json.loads(response.choices[0].message.content)
-    return result
+    return normalize_cv_analysis(result)

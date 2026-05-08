@@ -59,7 +59,7 @@ function ScoreBar({ label, score, color }: { label: string; score: number; color
   );
 }
 
-function EvaluationPanel({ ev, pozisyon }: { ev: Evaluation; pozisyon: string }) {
+function EvaluationPanel({ ev }: { ev: Evaluation }) {
   return (
     <div className="space-y-4 mt-4">
       {/* Genel puan */}
@@ -169,6 +169,7 @@ export function SimulationChat({ config, onReset }: { config: SimConfig; onReset
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const [evaluating, setEvaluating] = useState(false);
   const [mesajSayisi, setMesajSayisi] = useState(0);
+  const [error, setError] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -177,6 +178,7 @@ export function SimulationChat({ config, onReset }: { config: SimConfig; onReset
 
   async function startSimulation() {
     setLoading(true);
+    setError("");
     try {
       const res = await fetch(`${API_URL}/api/v1/simulation/start`, {
         method: "POST",
@@ -184,10 +186,15 @@ export function SimulationChat({ config, onReset }: { config: SimConfig; onReset
         body: JSON.stringify(config),
       });
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "Simülasyon başlatılamadı.");
+      }
       setSistemMesaji(data.sistem_mesaji);
       setMessages([{ role: "assistant", content: data.mesaj }]);
       setMesajSayisi(data.mesaj_sayisi);
       setStarted(true);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Bağlantı hatası.");
     } finally {
       setLoading(false);
     }
@@ -201,6 +208,7 @@ export function SimulationChat({ config, onReset }: { config: SimConfig; onReset
     const newMessages: Message[] = [...messages, { role: "user", content: userMsg }];
     setMessages(newMessages);
     setLoading(true);
+    setError("");
 
     try {
       const res = await fetch(`${API_URL}/api/v1/simulation/respond`, {
@@ -214,12 +222,17 @@ export function SimulationChat({ config, onReset }: { config: SimConfig; onReset
         }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "Cevap işlenemedi.");
+      }
       setMessages([...newMessages, { role: "assistant", content: data.mesaj }]);
       setMesajSayisi(data.mesaj_sayisi);
 
       if (data.bitti) {
         setBitti(true);
       }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Bağlantı hatası.");
     } finally {
       setLoading(false);
     }
@@ -227,6 +240,7 @@ export function SimulationChat({ config, onReset }: { config: SimConfig; onReset
 
   async function getEvaluation() {
     setEvaluating(true);
+    setError("");
     try {
       const res = await fetch(`${API_URL}/api/v1/simulation/evaluate`, {
         method: "POST",
@@ -237,7 +251,12 @@ export function SimulationChat({ config, onReset }: { config: SimConfig; onReset
         }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "Değerlendirme alınamadı.");
+      }
       setEvaluation(data.degerlendirme);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Bağlantı hatası.");
     } finally {
       setEvaluating(false);
     }
@@ -272,6 +291,11 @@ export function SimulationChat({ config, onReset }: { config: SimConfig; onReset
             "Mülakatı Başlat"
           )}
         </button>
+        {error && (
+          <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-3">
+            {error}
+          </p>
+        )}
       </div>
     );
   }
@@ -326,6 +350,12 @@ export function SimulationChat({ config, onReset }: { config: SimConfig; onReset
       </div>
 
       {/* Input */}
+      {error && (
+        <div className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-3">
+          {error}
+        </div>
+      )}
+
       {!bitti ? (
         <div className="flex gap-2">
           <input
@@ -377,7 +407,7 @@ export function SimulationChat({ config, onReset }: { config: SimConfig; onReset
       )}
 
       {evaluation && (
-        <EvaluationPanel ev={evaluation} pozisyon={config.pozisyon} />
+        <EvaluationPanel ev={evaluation} />
       )}
 
       {evaluation && (
