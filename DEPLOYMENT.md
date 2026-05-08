@@ -57,6 +57,7 @@ Manuel kurulum değerleri:
 
 Environment variables:
 
+- `PYTHON_VERSION`: `3.11.11`
 - `OPENAI_API_KEY`: OpenAI anahtarı
 - `OPENAI_MODEL`: `gpt-4o-mini`
 - `OPENAI_BASE_URL`: OpenAI kullanırken boş bırakılır. Gemini gibi OpenAI uyumlu servislerde ilgili base URL yazılır.
