@@ -19,6 +19,10 @@ class Settings(BaseSettings):
         ),
         env="ALLOWED_ORIGINS",
     )
+    allowed_origin_regex: str = Field(
+        default=r"^https://ai-mulakat.*\.vercel\.app$",
+        env="ALLOWED_ORIGIN_REGEX",
+    )
     rate_limit_requests: int = Field(default=30, env="RATE_LIMIT_REQUESTS")
     rate_limit_window_seconds: int = Field(default=3600, env="RATE_LIMIT_WINDOW_SECONDS")
 
@@ -29,6 +33,11 @@ class Settings(BaseSettings):
     @property
     def allowed_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.allowed_origins.split(",") if origin.strip()]
+
+    @property
+    def cors_origin_regex(self) -> str | None:
+        value = self.allowed_origin_regex.strip()
+        return value or None
 
     class Config:
         env_file = ".env"
