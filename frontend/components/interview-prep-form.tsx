@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { API_BASE_URL } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { Loader2, BookOpen, Building2, User, ChevronDown } from "lucide-react";
 
@@ -33,8 +34,7 @@ export function InterviewPrepForm({ onResult }: InterviewPrepFormProps) {
     setError("");
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const res = await fetch(`${apiUrl}/api/v1/interview-prep/generate`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/interview-prep/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pozisyon, sirket, seviye }),

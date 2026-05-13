@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { API_BASE_URL } from "@/lib/api";
 import { Upload, FileText, X, CheckCircle, AlertCircle } from "lucide-react";
 
 interface CvUploaderProps {
@@ -37,7 +38,6 @@ export function CvUploader({ onAnalysisComplete }: CvUploaderProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
   const handleFile = useCallback(
     async (file: File) => {
@@ -66,7 +66,7 @@ export function CvUploader({ onAnalysisComplete }: CvUploaderProps) {
         const formData = new FormData();
         formData.append("file", file);
 
-        const res = await fetch(`${BACKEND_URL}/api/v1/cv/analyze`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/cv/analyze`, {
           method: "POST",
           body: formData,
         });
@@ -89,7 +89,7 @@ export function CvUploader({ onAnalysisComplete }: CvUploaderProps) {
         setProgress(0);
       }
     },
-    [onAnalysisComplete, BACKEND_URL]
+    [onAnalysisComplete]
   );
 
   const onDrop = useCallback(

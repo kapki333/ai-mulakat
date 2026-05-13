@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { API_BASE_URL } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import {
   Loader2,
@@ -39,8 +40,6 @@ interface Evaluation {
   ise_alinir_mi: boolean;
   ise_alinir_aciklama: string;
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 function ScoreBar({ label, score, color }: { label: string; score: number; color: string }) {
   return (
@@ -180,7 +179,7 @@ export function SimulationChat({ config, onReset }: { config: SimConfig; onReset
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`${API_URL}/api/v1/simulation/start`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/simulation/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config),
@@ -211,7 +210,7 @@ export function SimulationChat({ config, onReset }: { config: SimConfig; onReset
     setError("");
 
     try {
-      const res = await fetch(`${API_URL}/api/v1/simulation/respond`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/simulation/respond`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -242,7 +241,7 @@ export function SimulationChat({ config, onReset }: { config: SimConfig; onReset
     setEvaluating(true);
     setError("");
     try {
-      const res = await fetch(`${API_URL}/api/v1/simulation/evaluate`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/simulation/evaluate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
